@@ -2,6 +2,10 @@
 
 An interactive product prototype for exploring seven sample dive destinations. The interface lets visitors search by destination or marine life, select a month, inspect a sample season calendar, and save spots during the current browser session. It is a frontend demonstration, **not** a live dive-planning or safety service.
 
+## Live demo
+
+[Explore the public BLUEPRINT demo](https://blueprint-dive-map.nicoleliuuuuu.chatgpt.site/). Try `10月 锤头鲨` in the search box, change the month, then compare the highlighted spots and save one. All condition and season values are illustrative, not live observations.
+
 ## What works
 
 - Search the seven local sample records by destination, country, wildlife, or tag. A query such as `10月 锤头鲨` selects a matching example and month.
