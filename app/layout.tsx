@@ -7,8 +7,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
   const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.includes("localhost") ? "http" : "https");
   const image = `${protocol}://${host}/og.png`;
-  const title = "BLUEPRINT｜全球 AI 潜水地图";
-  const description = "用洋流、季节与真实目击，找到下一次值得出发的潜水旅程。";
+  const title = "BLUEPRINT｜潜水目的地探索原型";
+  const description = "探索七个示例潜点与参考季节窗口。交互概念稿，不提供实时海况、AI 预测或潜水安全建议。";
   return {
     title,
     description,

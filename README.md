@@ -1,98 +1,40 @@
-# vinext-starter
+# BLUEPRINT — Dive Destination Explorer
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+An interactive product prototype for exploring seven sample dive destinations. The interface lets visitors search by destination or marine life, select a month, inspect a sample season calendar, and save spots during the current browser session. It is a frontend demonstration, **not** a live dive-planning or safety service.
 
-## Prerequisites
+## What works
 
-- Node.js `>=22.13.0`
+- Search the seven local sample records by destination, country, wildlife, or tag. A query such as `10月 锤头鲨` selects a matching example and month.
+- Select spots on the globe or in the list, switch months, and inspect the corresponding sample season window.
+- Save individual spots in the current page session and explore clearly labelled concept panels for providers, community, a smart mask, and a tour.
+- Responsive Chinese-language interface built with React, Next.js-compatible `vinext`, and Cloudflare Workers/Vite for deployment.
 
-## Quick Start
+## What is *not* implemented
+
+There is no AI-model call, live ocean-condition feed, real booking or provider integration, user account, persistent save, community backend, camera scanner, or 3D tour. The seven destinations and seasonal/condition values are illustrative sample data stored in [`app/page.tsx`](app/page.tsx), not verified forecasts. Do not use this prototype to decide whether a dive is safe; check current local conditions with a qualified dive operator.
+
+## Run locally
+
+Requirements: Node.js 22.13 or newer and pnpm (the repository uses `pnpm-lock.yaml`).
 
 ```bash
-npm install
-npm run dev
-npm run build
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
-This starter does not use `wrangler.jsonc`.
+Open the URL printed by the development server. No API key or database is required.
 
-## Included Shape
+## Verify
 
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
-
-## Workspace Auth Headers
-
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
-
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
+```bash
+pnpm exec tsc --noEmit
+pnpm test
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+`pnpm test` builds the production bundle and performs an HTTP smoke test against the rendered page. The test checks that the demo is labelled honestly and does not present old claims about live updates, AI predictions, or large-scale usage as facts.
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+## Architecture and next steps
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+The spot records and season windows live in the client component at [`app/page.tsx`](app/page.tsx). Search and selection are deterministic; the server only renders and serves the application. [`worker/index.ts`](worker/index.ts) is the Cloudflare Worker entry point. The `.openai/hosting.json` manifest has no D1 or R2 binding.
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
-
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
-
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
-
-## Useful Commands
-
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
-
-## Learn More
-
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+A production dive planner would need sourced, dated destination data; live-condition providers with provenance and failure handling; safety review by qualified divers; accessibility testing; and user research. Those are future work, not features of this demo.
